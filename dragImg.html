@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拖拽图片</title>
+    <link rel="stylesheet" href="./dist/drag.css">
+</head>
+
+<body>
+    <div class="drag_box drag_left">
+
+    </div>
+    <div class="drag_box drag_right">
+        <div class="drag_img" bg-src="./img/1.jpg"></div>
+        <div class="drag_img" bg-src="./img/2.jpg"></div>
+        <div class="drag_img" bg-src="./img/3.jpg"></div>
+        <div class="drag_img" bg-src="./img/4.jpg"></div>
+        <div class="drag_img" bg-src="./img/5.jpg"></div>
+    </div>
+</body>
+
+</html>
+<script>
+    var isDrag = false;
+    var isAdd = false;
+    var createEle = null;
+    var x = 0, y = 0, l = 0, t = 0;
+    var l_box = document.querySelector('.drag_left');
+    var r_box = document.querySelector('.drag_right');
+    var l_box_t = l_box.offsetTop;
+    var l_box_l = l_box.offsetLeft;
+    var l_box_b = l_box.offsetTop + l_box.clientHeight;
+    var l_box_r = l_box.offsetLeft + l_box.clientWidth;
+    var active_img;
+
+    // console.log(l_tl, l_tr)
+    // console.log(l_bl, l_br)
+
+    const dragKeyDowm = function (e, dv) {
+        x = e.clientX;
+        y = e.clientY;
+        l = dv.offsetLeft;
+        t = dv.offsetTop;
+        isDrag = true;
+
+        if (!createEle) {
+            let eleX = l + 'px';
+            let eleY = t + 'px';
+            let style = document.getElementById('drag_style');
+            let src = dv.getAttribute('bg-src');
+            active_img = dv;
+            let head = document.head || document.getElementsByTagName('head')[0]
+
+            document.querySelectorAll('.drag_img').className = 'drag_img';
+            dv.className = dv.className + ' drag_active';
+
+            if (!style) {
+                style = document.createElement('style');
+                style.type = 'text/css';
+                style.rel = 'stylesheet';
+                style.id = 'drag_style';
+
+                head.appendChild(style);
+            }
+
+            if (style.innerHTML) style.innerHTML = ''
+            style.appendChild(document.createTextNode('.drag_hover_img{background-image: url("' + src + '")}'));
+
+            createEle = document.createElement('div');
+            createEle.className = 'drag_hover drag_hover_img';
+            createEle.setAttribute('style', 'left: ' + eleX + ';top: ' + eleY)
+
+            document.querySelector('.drag_right').appendChild(createEle);
+        }
+    }
+
+    window.onmousemove = function (e) {
+        if (isDrag == false) return;
+        //获取x和y
+        var nx = e.clientX;
+        var ny = e.clientY;
+        //计算移动后的左偏移量和顶部的偏移量
+        var nl = nx - (x - l);
+        var nt = ny - (y - t);
+
+        let eleX = nl + 'px';
+        let eleY = nt + 'px';
+        createEle.setAttribute('style', 'left: ' + eleX + ';top: ' + eleY)
+        createEle.style.cursor = 'move';
+
+        let addImg = document.querySelector('.drag_img_add');
+
+        if ((l_box_l < nx && nx < l_box_r) && (l_box_t < ny && ny < l_box_b)) {
+            if (!addImg) {
+                let addImg = document.createElement('div');
+                let src = active_img.getAttribute('bg-src');
+                addImg.className = 'drag_img drag_img_add';
+                addImg.setAttribute('style', 'background-image: url(' + src + ')');
+                // l_box.innerHTML = '';
+                l_box.appendChild(addImg)
+                // console.log(addImg)
+                isAdd = true;
+            }
+        } else {
+            if (addImg) l_box.removeChild(addImg)
+            isAdd = false
+        }
+    }
+
+    window.onmouseup = function (e) {
+        if (createEle) document.querySelector('.drag_right').removeChild(createEle);
+        // console.log(isAdd);
+        if (isAdd) r_box.removeChild(active_img)
+
+        document.querySelectorAll('.drag_img').forEach(m => m.className = 'drag_img')
+        createEle = null;
+        isDrag = false;
+        isAdd = false
+    }
+
+    document.querySelectorAll('.drag_img').forEach(m => {
+        let src = m.getAttribute('bg-src');
+        m.setAttribute('style', 'background-image: url(' + src + ')');
+
+        m.onmousedown = function (e) {
+            dragKeyDowm(e, m);
+        }
+    })
+
+</script>

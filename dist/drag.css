@@ -1,0 +1,43 @@
+.drag_box {
+    width: 600px;
+    height: 600px;
+    border: 1px solid #333;
+    display: inline-block;
+    margin-right: 60px;
+}
+
+.drag_box::after {
+    content: '';
+    display: block;
+    height: 0;
+    visibility: hidden;
+    clear: both;
+}
+
+.drag_left {
+    height: 700px;
+}
+
+.drag_img {
+    width: 200px;
+    height: 200px;
+    float: left;
+    background-position: center;
+    background-size: cover;
+}
+
+.drag_hover {
+    width: 200px;
+    height: 200px;
+    position: absolute;
+    z-index: 10;
+    border: 1px solid red;
+    top: 0;
+    left: 0;
+    background-position: center;
+    background-size: cover;
+}
+
+.drag_active, .drag_img_add {
+    opacity: .5;
+}
